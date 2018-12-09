@@ -1,0 +1,152 @@
+#: import main main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+
+WeatherRoot:
+
+<WeatherRoot>:
+  LocationForm:
+
+<LocationForm>:
+  orientation:"vertical"
+  search_input:search_box
+  search_result:search_result_list
+  BoxLayout:
+    height:"40dp"
+    size_hint_y:None
+    TextInput:
+      id:search_box
+      size_hint_x:50
+      text:"Enter location"
+      multiline:False
+      focus:True
+      on_text_validate: root.search_location()
+    Button:
+      id:search_button
+      size_hint_x:25
+      text:"Search"
+      on_press:root.search_location()
+    Button:
+      id:current_button
+      size_hint_x:25
+      text:"Current Location"
+  ListView:
+    id:search_result_list
+    #item_strings: []
+    adapter:
+      ListAdapter(data=[], cls=main.LocationButton)
+  Button:
+    height:"40dp"
+    size_hint_y:None
+    text:"Cancel"
+    color: 0,0,0,1
+    background_color: 0,95,255,1
+    on_press:app.root.show_current_weather(None)
+
+
+<LocationButton>:
+  on_press: app.root.show_current_weather(self.text)
+
+<CurrentWeather>:
+  orientation: "vertical"
+  BoxLayout:
+    orientation:"horizontal"
+    Label:
+      font_size:"40dp"
+      text:root.location
+    Label:
+      font_size: "40dp"
+      text:"Temp: {}".format(root.temp)
+  BoxLayout:
+    orientation: "horizontal"
+    Label:
+      font_size: "50dp"
+      text: root.conditions
+    AsyncImage:
+      source: root.conditions_image
+  BoxLayout:
+    orientation:"horizontal"
+    Label:
+      font_size: "40dp"
+      text:"Max Temp: {}".format(root.temp_max)
+    Label:
+      font_size:"40dp"
+      text:"Min Temp: {}".format(root.temp_min)
+  BoxLayout:
+    orientation:"horizontal"
+    size_hint_y: None
+    height: "40dp"
+    Button:
+      text: "Show Locations"
+      on_press:app.root.show_location()
+    Button:
+      text: "Forecast"
+      on_press:app.root.show_forecast(root.location)
+
+
+<Locations@BoxLayout>:
+  orientation:"vertical"
+  location_list:location_list
+
+  ListView:
+    id:location_list
+    adapter:
+      ListAdapter(data=[],cls=main.LocationButton)
+  BoxLayout:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "40dp"
+    Button:
+      text: "Add Location"
+      on_press: app.root.show_location_form()
+  BoxLayout:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "40dp"
+    Button:
+      text: "Clear List"
+      on_press: app.root.clear_location_list()
+
+<ForecastLabel@BoxLayout>:
+  date: ""
+  conditions_image: ""
+  conditions: ""
+  temp_min: None
+  temp_max: None
+  canvas.before:
+    Color:
+      rgb: [0.2,0.2,0.2]
+    #Line:
+      #point:[self.pos[0],self.pos[1],self.width,self.pos[1]]
+  Label:
+    text:root.date
+  BoxLayout:
+    orientation: "vertical"
+    AsyncImage:
+      source: root.conditions_image
+    Label:
+      text: root.conditions
+  BoxLayout:
+    orientation:"vertical"
+    Label:
+      text: "Low: {}".format(root.temp_min)
+    Label:
+      text: "High: {}".format(root.temp_max)
+
+
+<Forecast>:
+  forecast_container:forecast_container
+  orientation: "vertical"
+  Label:
+    size_hint_y:0.1
+    font_size:"30dp"
+    text: "{}".format(root.location)
+  BoxLayout:
+    orientation:"vertical"
+    id: forecast_container
+  BoxLayout:
+    orientation:"horizontal"
+    size_hint_y:None
+    height:"40dp"
+    Button:
+      text:"Current"
+      on_press: app.root.show_current_weather(root.location)
